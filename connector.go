@@ -2,6 +2,8 @@ package kafka_connector
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/adnvilla/kafka-connector/base"
 	"github.com/adnvilla/kafka-connector/zkafka"
 )
@@ -12,25 +14,27 @@ type KafkaConnector interface {
 	Close() error
 }
 
-func NewClient(cfg Config) (KafkaConnector, error) {
+func NewClient(cfg base.Config) (KafkaConnector, error) {
 	client := &Client{
 		cfg: cfg,
 	}
 
 	switch cfg.Provider {
-	case ZKakfa:
+	case base.ZKakfa:
 		client.provider = zkafka.GetConnector(base.Config{
 			BootstrapServers: cfg.BootstrapServers,
 			ClientID:         cfg.ClientID,
 			UseGlobalClient:  cfg.UseGlobalClient,
 		})
+	default:
+		return nil, errors.New(fmt.Sprintf("Not supported provider: %v", cfg.Provider))
 	}
 
 	return client, nil
 }
 
 type Client struct {
-	cfg      Config
+	cfg      base.Config
 	provider KafkaConnector
 }
 

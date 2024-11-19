@@ -7,14 +7,15 @@ import (
 	"time"
 
 	kconnector "github.com/adnvilla/kafka-connector"
+	"github.com/adnvilla/kafka-connector/base"
 )
 
 func main() {
 	ctx := context.Background()
-	client, err := kconnector.NewClient(kconnector.Config{
+	client, err := kconnector.NewClient(base.Config{
 		BootstrapServers: []string{"localhost:29092"},
 		ClientID:         "example",
-		Provider:         kconnector.ZKakfa,
+		Provider:         base.ZKakfa,
 		UseGlobalClient:  true,
 	})
 	randomNames := []string{"stewy", "lydia", "asif", "mike", "justin"}

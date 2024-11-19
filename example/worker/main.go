@@ -3,18 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/go-viper/mapstructure/v2"
 	"log"
 
 	kconnector "github.com/adnvilla/kafka-connector"
+	"github.com/adnvilla/kafka-connector/base"
+	"github.com/go-viper/mapstructure/v2"
 )
 
 func main() {
 	ctx := context.Background()
-	client, err := kconnector.NewClient(kconnector.Config{
+	client, err := kconnector.NewClient(base.Config{
 		BootstrapServers: []string{"localhost:29092"},
 		ClientID:         "example",
-		Provider:         kconnector.ZKakfa,
+		Provider:         base.ZKakfa,
 		UseGlobalClient:  false,
 	})
 
