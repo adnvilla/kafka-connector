@@ -2,12 +2,12 @@ package zkafka
 
 import (
 	"context"
+	"github.com/adnvilla/kafka-connector/base"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
-	kconnector "github.com/adnvilla/kafka-connector"
 	"github.com/zillow/zfmt"
 	"github.com/zillow/zkafka"
 )
@@ -19,12 +19,12 @@ var (
 )
 
 type Connector struct {
-	cfg      kconnector.Config
+	cfg      base.Config
 	Instance *zkafka.Client
 	Error    error
 }
 
-func getConnector(cfg kconnector.Config) *Connector {
+func getConnector(cfg base.Config) *Connector {
 	if cfg.UseGlobalClient {
 		kafkaOnce.Do(func() {
 			client := zkafka.NewClient(zkafka.Config{
@@ -62,7 +62,7 @@ func (c *Connector) ProduceMessage(ctx context.Context, topic string, message in
 	return nil
 }
 
-func (c *Connector) ConsumeMessages(ctx context.Context, topic, groupId string, handler kconnector.ConsumerHandler) error {
+func (c *Connector) ConsumeMessages(ctx context.Context, topic, groupId string, handler base.ConsumerHandler) error {
 
 	topicConfig := zkafka.ConsumerTopicConfig{
 		// ClientID is used for caching inside zkafka, and observability within streamz dashboards. But it's not an important
@@ -114,7 +114,7 @@ func (c *Connector) Close() error {
 }
 
 type processor struct {
-	handler kconnector.ConsumerHandler
+	handler base.ConsumerHandler
 }
 
 func (p processor) Process(ctx context.Context, msg *zkafka.Message) error {

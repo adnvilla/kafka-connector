@@ -2,16 +2,15 @@ package kafka_connector
 
 import (
 	"context"
+	"github.com/adnvilla/kafka-connector/base"
 	"github.com/adnvilla/kafka-connector/zkafka"
 )
 
 type KafkaConnector interface {
 	ProduceMessage(ctx context.Context, topic string, message interface{}) error
-	ConsumeMessages(ctx context.Context, topic, groupId string, handler ConsumerHandler) error
+	ConsumeMessages(ctx context.Context, topic, groupId string, handler base.ConsumerHandler) error
 	Close() error
 }
-
-type ConsumerHandler func(ctx context.Context, message interface{}) error
 
 func NewClient(cfg Config) (KafkaConnector, error) {
 	client := &Client{
@@ -20,7 +19,11 @@ func NewClient(cfg Config) (KafkaConnector, error) {
 
 	switch cfg.Provider {
 	case ZKakfa:
-		client.provider = zkafka.GetConnector(cfg)
+		client.provider = zkafka.GetConnector(base.Config{
+			BootstrapServers: cfg.BootstrapServers,
+			ClientID:         cfg.ClientID,
+			UseGlobalClient:  cfg.UseGlobalClient,
+		})
 	}
 
 	return client, nil
@@ -35,7 +38,7 @@ func (k *Client) ProduceMessage(ctx context.Context, topic string, message inter
 	return k.provider.ProduceMessage(ctx, topic, message)
 }
 
-func (k *Client) ConsumeMessages(ctx context.Context, topic, groupId string, handler ConsumerHandler) error {
+func (k *Client) ConsumeMessages(ctx context.Context, topic, groupId string, handler base.ConsumerHandler) error {
 	return k.provider.ConsumeMessages(ctx, topic, groupId, handler)
 }
 
